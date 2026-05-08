@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
-import os
+import gspread
+from google.oauth2.service_account import Credentials
 
 st.set_page_config(
     page_title="Koko's Restaurant Map",
@@ -10,19 +11,53 @@ st.set_page_config(
     layout="wide"
 )
 
-CSV_FILE = "restaurants.csv"
+# ============================================================
+# GOOGLE SHEETS CONNECTION
+# ============================================================
+SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
+]
 
+@st.cache_resource
+def get_sheet():
+    creds = Credentials.from_service_account_info(
+        st.secrets["gcp_service_account"],
+        scopes=SCOPES
+    )
+    client = gspread.authorize(creds)
+    sheet = client.open_by_key(st.secrets["sheets"]["spreadsheet_id"]).sheet1
+    return sheet
+
+def load_data():
+    sheet = get_sheet()
+    records = sheet.get_all_records()
+    if records:
+        return pd.DataFrame(records)
+    return pd.DataFrame(columns=["name", "cuisine", "city", "koko", "value"])
+
+def add_row(name, cuisine, city, koko, value):
+    sheet = get_sheet()
+    sheet.append_row([name, cuisine, city, koko, value])
+
+def delete_row(name):
+    sheet = get_sheet()
+    cell = sheet.find(name)
+    if cell:
+        sheet.delete_rows(cell.row)
+
+# ============================================================
+# STYLES
+# ============================================================
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap');
 
-/* Force font everywhere */
 html, body, div, p, span, label, input,
 [class*="st-"], [class*="css"] {
     font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
 
-/* Background */
 .stApp {
     background: #f7fdf9 !important;
     background-image:
@@ -30,21 +65,15 @@ html, body, div, p, span, label, input,
         radial-gradient(ellipse at 95% 0%, rgba(155,114,207,0.2) 0%, transparent 40%) !important;
 }
 
-/* Kill default streamlit padding weirdness */
 .block-container { padding-top: 2rem !important; }
 
-/* Headings */
 h1, h2, h3 {
     font-family: 'Playfair Display', serif !important;
     color: #1c1c2e !important;
 }
 
-/* All text visible by default */
-p, span, div, label {
-    color: #1c1c2e !important;
-}
+p, span, div, label { color: #1c1c2e !important; }
 
-/* ---- STAT CARDS ---- */
 .stat-card {
     background: #ffffff;
     border-radius: 16px;
@@ -76,12 +105,11 @@ p, span, div, label {
     display: block;
     margin-top: 0.15rem;
 }
+.stat-card.c-mint  { border-top: 3px solid #5cb896; }
 .stat-card.c-mint  .sub { color: #3a9e74; }
-.stat-card.c-mint      { border-top: 3px solid #5cb896; }
+.stat-card.c-purple { border-top: 3px solid #9b72cf; }
 .stat-card.c-purple .sub { color: #7c53b8; }
-.stat-card.c-purple    { border-top: 3px solid #9b72cf; }
 
-/* ---- SECTION HEADER ---- */
 .sec-head {
     font-family: 'Playfair Display', serif;
     font-size: 1.4rem;
@@ -92,7 +120,6 @@ p, span, div, label {
     border-bottom: 1.5px solid #e0d9f5;
 }
 
-/* ---- FORM PANEL ---- */
 .form-panel {
     background: #ffffff;
     border-radius: 20px;
@@ -101,7 +128,6 @@ p, span, div, label {
     box-shadow: 0 4px 20px rgba(155,114,207,0.09);
 }
 
-/* ---- SCORE BOXES ---- */
 .score-row {
     display: flex;
     gap: 0.75rem;
@@ -134,7 +160,6 @@ p, span, div, label {
     margin-top: 0.2rem;
 }
 
-/* ---- VERDICT ---- */
 .verdict-row {
     margin-top: 0.6rem;
     font-size: 0.85rem;
@@ -150,7 +175,6 @@ p, span, div, label {
     margin-left: 0.3rem;
 }
 
-/* ---- MAP PANEL ---- */
 .map-panel {
     background: #ffffff;
     border-radius: 20px;
@@ -159,7 +183,6 @@ p, span, div, label {
     box-shadow: 0 4px 20px rgba(155,114,207,0.07);
 }
 
-/* ---- TABLE PANEL ---- */
 .table-panel {
     background: #ffffff;
     border-radius: 20px;
@@ -169,7 +192,6 @@ p, span, div, label {
     margin-top: 1.5rem;
 }
 
-/* ---- STREAMLIT SLIDER ---- */
 [data-testid="stSlider"] label {
     font-size: 0.78rem !important;
     font-weight: 600 !important;
@@ -178,7 +200,6 @@ p, span, div, label {
     letter-spacing: 0.08em !important;
 }
 
-/* ---- SUBMIT BUTTON ---- */
 [data-testid="stFormSubmitButton"] button {
     background: linear-gradient(135deg, #7c53b8, #9b72cf) !important;
     color: white !important;
@@ -187,15 +208,12 @@ p, span, div, label {
     font-weight: 600 !important;
     font-size: 0.9rem !important;
     letter-spacing: 0.04em !important;
-    padding: 0.6rem 1.2rem !important;
     width: 100% !important;
 }
 [data-testid="stFormSubmitButton"] button:hover {
     opacity: 0.87 !important;
-    background: linear-gradient(135deg, #6b44a8, #8a61be) !important;
 }
 
-/* ---- TEXT INPUTS ---- */
 [data-testid="stTextInput"] input {
     background: #faf8ff !important;
     border: 1.5px solid #e0d9f5 !important;
@@ -224,18 +242,8 @@ div[data-testid="stForm"] {
 """, unsafe_allow_html=True)
 
 # ============================================================
-# DATA HELPERS
+# HELPERS
 # ============================================================
-@st.cache_data
-def load_data():
-    if os.path.exists(CSV_FILE):
-        return pd.read_csv(CSV_FILE)
-    return pd.DataFrame(columns=["name", "cuisine", "city", "koko", "value"])
-
-def save_data(df):
-    df.to_csv(CSV_FILE, index=False)
-    st.cache_data.clear()
-
 def get_zone(koko, value):
     if koko <= 4:
         if value <= 2:   return "Never Eat Here"
@@ -267,7 +275,7 @@ def get_verdict_style(zone):
 # HEADER
 # ============================================================
 st.markdown("""
-<div style="text-align:center; padding: 1.5rem 0 0.5rem;">
+<div style="text-align:center; padding:1.5rem 0 0.5rem;">
     <h1 style="font-family:'Playfair Display',serif; font-size:3rem; font-weight:700;
                color:#1c1c2e; margin:0; letter-spacing:-0.02em;">
         Koko's <em style="color:#7c53b8;">Restaurant</em> Map
@@ -281,7 +289,12 @@ st.markdown("""
             width:50%; margin:1rem auto 1.5rem; border-radius:2px; opacity:0.5;"></div>
 """, unsafe_allow_html=True)
 
-df = load_data()
+# ============================================================
+# LOAD DATA
+# ============================================================
+with st.spinner("Loading restaurants..."):
+    df = load_data()
+
 total    = len(df)
 avg_koko = round(df["koko"].mean(), 1) if total > 0 else "—"
 worth_it = len(df[df["koko"] >= 7])   if total > 0 else 0
@@ -354,15 +367,9 @@ with left:
             if not name.strip():
                 st.error("Please enter a restaurant name.")
             else:
-                new_row = pd.DataFrame([{
-                    "name":    name.strip(),
-                    "cuisine": cuisine.strip() or "Unknown",
-                    "city":    city.strip()    or "Unknown",
-                    "koko":    koko,
-                    "value":   value,
-                }])
-                df = pd.concat([df, new_row], ignore_index=True)
-                save_data(df)
+                with st.spinner("Saving..."):
+                    add_row(name.strip(), cuisine.strip() or "Unknown",
+                            city.strip() or "Unknown", koko, value)
                 st.success(f"'{name.strip()}' added — {zone}")
                 st.rerun()
 
@@ -371,10 +378,11 @@ with left:
     if total > 0:
         st.markdown("<br>", unsafe_allow_html=True)
         with st.expander("🗑️ Remove a restaurant"):
-            to_delete = st.selectbox("Select", df["name"].tolist(), label_visibility="collapsed")
+            to_delete = st.selectbox("Select", df["name"].tolist(),
+                                     label_visibility="collapsed")
             if st.button("Remove", use_container_width=True):
-                df = df[df["name"] != to_delete].reset_index(drop=True)
-                save_data(df)
+                with st.spinner("Removing..."):
+                    delete_row(to_delete)
                 st.rerun()
 
 with right:
@@ -410,7 +418,8 @@ with right:
                           fillcolor=color, line_width=0, layer="below")
             fig.add_annotation(x=(x0+x1)/2, y=(y0+y1)/2, text=label,
                                showarrow=False, opacity=0.65,
-                               font=dict(size=10, color="#7070a0", family="Plus Jakarta Sans"))
+                               font=dict(size=10, color="#7070a0",
+                                         family="Plus Jakarta Sans"))
 
         for y, label, color in [
             (4.5, "don't bother below here", "rgba(220,80,80,0.45)"),
@@ -422,7 +431,8 @@ with right:
                           annotation_font_size=9)
 
         for x, label in [(2.5, "fair value"), (3.5, "good value")]:
-            fig.add_vline(x=x, line_dash="dot", line_color="rgba(155,114,207,0.35)",
+            fig.add_vline(x=x, line_dash="dot",
+                          line_color="rgba(155,114,207,0.35)",
                           annotation_text=label, annotation_position="top",
                           annotation_font_size=9, annotation_font_color="#7c53b8")
 
@@ -430,7 +440,8 @@ with right:
                    "#48cae4","#7b5ea7","#80ed99","#b197fc","#52b788","#da77f2"]
 
         scatter = px.scatter(df, x="value", y="koko", hover_name="name",
-                             hover_data={"cuisine": True, "city": True, "koko": True, "value": True},
+                             hover_data={"cuisine": True, "city": True,
+                                         "koko": True, "value": True},
                              color="cuisine", color_discrete_sequence=palette)
         for trace in scatter.data:
             trace.marker.size = 13
@@ -439,20 +450,25 @@ with right:
             fig.add_trace(trace)
 
         fig.update_layout(
-            xaxis=dict(title=dict(text="Value (Price / Volume)", font=dict(size=11, color="#7070a0")),
-                       range=[0.5, 5.5], dtick=1, showgrid=True,
-                       gridcolor="rgba(224,217,245,0.8)", zeroline=False,
-                       tickfont=dict(size=10, color="#9090b0")),
-            yaxis=dict(title=dict(text="Koko Score (Flavor)", font=dict(size=11, color="#7070a0")),
-                       range=[0.5, 10.5], dtick=1, showgrid=True,
-                       gridcolor="rgba(224,217,245,0.8)", zeroline=False,
-                       tickfont=dict(size=10, color="#9090b0")),
+            xaxis=dict(
+                title=dict(text="Value (Price / Volume)",
+                           font=dict(size=11, color="#7070a0")),
+                range=[0.5, 5.5], dtick=1, showgrid=True,
+                gridcolor="rgba(224,217,245,0.8)", zeroline=False,
+                tickfont=dict(size=10, color="#9090b0")),
+            yaxis=dict(
+                title=dict(text="Koko Score (Flavor)",
+                           font=dict(size=11, color="#7070a0")),
+                range=[0.5, 10.5], dtick=1, showgrid=True,
+                gridcolor="rgba(224,217,245,0.8)", zeroline=False,
+                tickfont=dict(size=10, color="#9090b0")),
             plot_bgcolor="white",
             paper_bgcolor="rgba(0,0,0,0)",
-            legend=dict(title=dict(text="Cuisine", font=dict(size=10, color="#7070a0")),
-                        font=dict(size=10, family="Plus Jakarta Sans"),
-                        bgcolor="rgba(255,255,255,0.95)",
-                        bordercolor="#e0d9f5", borderwidth=1, borderpad=8),
+            legend=dict(
+                title=dict(text="Cuisine", font=dict(size=10, color="#7070a0")),
+                font=dict(size=10, family="Plus Jakarta Sans"),
+                bgcolor="rgba(255,255,255,0.95)",
+                bordercolor="#e0d9f5", borderwidth=1, borderpad=8),
             margin=dict(l=10, r=130, t=15, b=10),
             height=540,
             font=dict(family="Plus Jakarta Sans"),
@@ -470,7 +486,8 @@ if not df.empty:
     st.markdown('<div class="sec-head">All Ratings</div>', unsafe_allow_html=True)
 
     df_disp = df.copy()
-    df_disp["verdict"] = df_disp.apply(lambda r: get_zone(r["koko"], r["value"]), axis=1)
+    df_disp["verdict"] = df_disp.apply(
+        lambda r: get_zone(r["koko"], r["value"]), axis=1)
     df_disp = df_disp.sort_values("koko", ascending=False).reset_index(drop=True)
     df_disp.index += 1
 
@@ -481,8 +498,10 @@ if not df.empty:
             "name":    st.column_config.TextColumn("Restaurant", width="medium"),
             "cuisine": st.column_config.TextColumn("Cuisine"),
             "city":    st.column_config.TextColumn("City"),
-            "koko":    st.column_config.ProgressColumn("Koko Score",  min_value=0, max_value=10, format="%d / 10"),
-            "value":   st.column_config.ProgressColumn("Value Score", min_value=0, max_value=5,  format="%d / 5"),
+            "koko":    st.column_config.ProgressColumn(
+                "Koko Score", min_value=0, max_value=10, format="%d / 10"),
+            "value":   st.column_config.ProgressColumn(
+                "Value Score", min_value=0, max_value=5, format="%d / 5"),
             "verdict": st.column_config.TextColumn("Verdict"),
         }
     )
