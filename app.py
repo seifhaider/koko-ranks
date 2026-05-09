@@ -267,6 +267,11 @@ div[data-testid="stForm"] {
     box-shadow: 0 4px 20px rgba(155,114,207,0.07);
     margin-top: 1.5rem;
 }
+
+[data-testid="stExpander"] summary p {
+    font-size: 0.85rem !important;
+    color: #4a4a6a !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
