@@ -379,15 +379,22 @@ with left:
 
     if total > 0:
         st.markdown("<br>", unsafe_allow_html=True)
-        with st.expander("Remove a restaurant"):
+    
+        if "show_remove" not in st.session_state:
+            st.session_state.show_remove = False
+
+        if st.button("Remove a restaurant", use_container_width=True):
+            st.session_state.show_remove = not st.session_state.show_remove
+
+        if st.session_state.show_remove:
             to_delete = st.selectbox("Select restaurant to remove",
-                                     df["name"].tolist(),
-                                     label_visibility="collapsed")
-            if st.button("Remove", use_container_width=True):
+                                    df["name"].tolist(),
+                                    label_visibility="collapsed")
+            if st.button("Confirm Remove", use_container_width=True):
                 with st.spinner("Removing..."):
                     delete_row(to_delete)
+                st.session_state.show_remove = False
                 st.rerun()
-
 # ---- RIGHT: MAP ----
 with right:
     with st.container(border=True):
@@ -422,7 +429,7 @@ with right:
                               fillcolor=color, line_width=0, layer="below")
                 fig.add_annotation(x=(x0+x1)/2, y=(y0+y1)/2, text=label,
                                    showarrow=False, opacity=0.65,
-                                   font=dict(size=10, color="#7070a0",
+                                   font=dict(size=10, color="#3a3a5a",
                                              family="Plus Jakarta Sans"))
 
             for y, label, color in [
@@ -432,13 +439,13 @@ with right:
             ]:
                 fig.add_hline(y=y, line_dash="dash", line_color=color,
                               annotation_text=label, annotation_position="top right",
-                              annotation_font_size=9)
+                              annotation_font_size=9, annotation_font_color="#3a3a5a")
 
             for x, label in [(2.5, "fair value"), (3.5, "good value")]:
                 fig.add_vline(x=x, line_dash="dot",
                               line_color="rgba(155,114,207,0.35)",
                               annotation_text=label, annotation_position="top",
-                              annotation_font_size=9, annotation_font_color="#7c53b8")
+                              annotation_font_size=9, annotation_font_color="#5a3a9a")
 
             palette = ["#5cb896","#9b72cf","#3aafa9","#c77dff",
                        "#48cae4","#7b5ea7","#80ed99","#b197fc","#52b788","#da77f2"]
