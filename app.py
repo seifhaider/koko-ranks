@@ -271,6 +271,19 @@ div[data-testid="stForm"] {
 [data-testid="stExpander"] summary span[data-testid="stMarkdownContainer"] p {
     display: none !important;
 }
+            
+[data-testid="stBaseButton-secondary"] {
+    background: #ffffff !important;
+    color: #4a4a6a !important;
+    border: 1.5px solid #e0d9f5 !important;
+    border-radius: 12px !important;
+    font-weight: 500 !important;
+}
+[data-testid="stBaseButton-secondary"]:hover {
+    background: #f0e9ff !important;
+    border-color: #9b72cf !important;
+    color: #7c53b8 !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
