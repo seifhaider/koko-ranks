@@ -268,16 +268,7 @@ div[data-testid="stForm"] {
     margin-top: 1.5rem;
 }
 
-[data-testid="stExpander"] summary {
-    font-size: 0.85rem !important;
-    color: #4a4a6a !important;
-}
-
-details summary svg {
-    display: none !important;
-}
-
-[data-testid="stExpander"] details summary span {
+[data-testid="stExpander"] summary span[data-testid="stMarkdownContainer"] p {
     display: none !important;
 }
 </style>
