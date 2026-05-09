@@ -452,14 +452,14 @@ with right:
             fig.update_layout(
                 xaxis=dict(
                     title="Value (Price / Volume)",
-                    range=[0.5, 5.5], dtick=1, showgrid=True,
+                    range=[0.5, 5.5], dtick=1, showgrid=False,
                     gridcolor="rgba(224,217,245,0.8)", zeroline=False,
-                    tickfont=dict(size=10, color="#9090b0")),
+                    tickfont=dict(size=10, color="#4a4a6a")),
                 yaxis=dict(
                     title="Koko Score (Flavor)",
-                    range=[0.5, 10.5], dtick=1, showgrid=True,
+                    range=[0.5, 10.5], dtick=1, showgrid=False,
                     gridcolor="rgba(224,217,245,0.8)", zeroline=False,
-                    tickfont=dict(size=10, color="#9090b0")),
+                    tickfont=dict(size=10, color="#4a4a6a")),
                 plot_bgcolor="white",
                 paper_bgcolor="rgba(0,0,0,0)",
                 legend=dict(
