@@ -375,7 +375,7 @@ with left:
 
     if total > 0:
         st.markdown("<br>", unsafe_allow_html=True)
-        with st.expander("🗑️ Remove a restaurant"):
+        with st.expander("Remove a restaurant"):
             to_delete = st.selectbox("Select restaurant to remove",
                                      df["name"].tolist(),
                                      label_visibility="collapsed")
