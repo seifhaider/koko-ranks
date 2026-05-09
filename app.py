@@ -345,54 +345,51 @@ with left:
     with st.container(border=True):
         st.markdown('<div class="sec-head">Add a Restaurant</div>', unsafe_allow_html=True)
 
-        with st.form("add_form", clear_on_submit=True):
-            name = st.text_input("Restaurant Name", placeholder="e.g. Trattoria da Pino")
-            col_a, col_b = st.columns(2)
-            with col_a:
-                cuisine = st.text_input("Cuisine", placeholder="Italian")
-            with col_b:
-                city = st.text_input("City", placeholder="Milan")
+        name = st.text_input("Restaurant Name", placeholder="e.g. Trattoria da Pino")
+        col_a, col_b = st.columns(2)
+        with col_a:
+            cuisine = st.text_input("Cuisine", placeholder="Italian")
+        with col_b:
+            city = st.text_input("City", placeholder="Milan")
 
-            st.markdown("<br>", unsafe_allow_html=True)
-            koko  = st.slider("Koko Score — Flavor",          1, 10, 5)
-            value = st.slider("Value Score — Price / Volume", 1, 5,  3)
+        st.markdown("<br>", unsafe_allow_html=True)
+        koko  = st.slider("Koko Score — Flavor",          1, 10, 5)
+        value = st.slider("Value Score — Price / Volume", 1, 5,  3)
 
-            zone = get_zone(koko, value)
-            vstyle, vicon = get_verdict_style(zone)
+        zone = get_zone(koko, value)
+        vstyle, vicon = get_verdict_style(zone)
 
-            st.markdown(f"""
-            <div class="score-row">
-                <div class="sbox mint-box">
-                    <span class="snum">{koko}<small>/10</small></span>
-                    <span class="slbl">Flavor</span>
-                </div>
-                <div class="sbox purple-box">
-                    <span class="snum">{value}<small>/5</small></span>
-                    <span class="slbl">Value</span>
-                </div>
+        st.markdown(f"""
+        <div class="score-row">
+            <div class="sbox mint-box">
+                <span class="snum">{koko}<small>/10</small></span>
+                <span class="slbl">Flavor</span>
             </div>
-            <div class="verdict-row">
-                Verdict:
-                <span class="vchip" style="{vstyle}">{vicon} {zone}</span>
+            <div class="sbox purple-box">
+                <span class="snum">{value}<small>/5</small></span>
+                <span class="slbl">Value</span>
             </div>
-            <br>
-            """, unsafe_allow_html=True)
+        </div>
+        <div class="verdict-row">
+            Verdict:
+            <span class="vchip" style="{vstyle}">{vicon} {zone}</span>
+        </div>
+        <br>
+        """, unsafe_allow_html=True)
 
-            submitted = st.form_submit_button("Add to Map →", use_container_width=True)
-
-            if submitted:
-                if not name.strip():
-                    st.error("Please enter a restaurant name.")
-                else:
-                    with st.spinner("Saving..."):
-                        add_row(name.strip(), cuisine.strip() or "Unknown",
-                                city.strip() or "Unknown", koko, value)
-                    st.success(f"'{name.strip()}' added — {zone}")
-                    st.rerun()
+        if st.button("Add to Map →", use_container_width=True, type="primary"):
+            if not name.strip():
+                st.error("Please enter a restaurant name.")
+            else:
+                with st.spinner("Saving..."):
+                    add_row(name.strip(), cuisine.strip() or "Unknown",
+                            city.strip() or "Unknown", koko, value)
+                st.success(f"'{name.strip()}' added — {zone}")
+                st.rerun()
 
     if total > 0:
         st.markdown("<br>", unsafe_allow_html=True)
-    
+
         if "show_remove" not in st.session_state:
             st.session_state.show_remove = False
 
@@ -401,8 +398,8 @@ with left:
 
         if st.session_state.show_remove:
             to_delete = st.selectbox("Select restaurant to remove",
-                                    df["name"].tolist(),
-                                    label_visibility="collapsed")
+                                     df["name"].tolist(),
+                                     label_visibility="collapsed")
             if st.button("Confirm Remove", use_container_width=True):
                 with st.spinner("Removing..."):
                     delete_row(to_delete)
