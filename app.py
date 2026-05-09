@@ -534,27 +534,26 @@ with right:
 # ============================================================
 if not df.empty:
     st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown('<div class="table-wrap">', unsafe_allow_html=True)
-    st.markdown('<div class="sec-head">All Ratings</div>', unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown('<div class="sec-head">All Ratings</div>', unsafe_allow_html=True)
 
-    df_disp = df.copy()
-    df_disp["verdict"] = df_disp.apply(
-        lambda r: get_zone(r["koko"], r["value"]), axis=1)
-    df_disp = df_disp.sort_values("koko", ascending=False).reset_index(drop=True)
-    df_disp.index += 1
+        df_disp = df.copy()
+        df_disp["verdict"] = df_disp.apply(
+            lambda r: get_zone(r["koko"], r["value"]), axis=1)
+        df_disp = df_disp.sort_values("koko", ascending=False).reset_index(drop=True)
+        df_disp.index += 1
 
-    st.dataframe(
-        df_disp[["name", "cuisine", "city", "koko", "value", "verdict"]],
-        use_container_width=True,
-        column_config={
-            "name":    st.column_config.TextColumn("Restaurant", width="medium"),
-            "cuisine": st.column_config.TextColumn("Cuisine"),
-            "city":    st.column_config.TextColumn("City"),
-            "koko":    st.column_config.ProgressColumn(
-                "Koko Score", min_value=0, max_value=10, format="%d / 10"),
-            "value":   st.column_config.ProgressColumn(
-                "Value Score", min_value=0, max_value=5, format="%d / 5"),
-            "verdict": st.column_config.TextColumn("Verdict"),
-        }
-    )
-    st.markdown('</div>', unsafe_allow_html=True)
+        st.dataframe(
+            df_disp[["name", "cuisine", "city", "koko", "value", "verdict"]],
+            use_container_width=True,
+            column_config={
+                "name":    st.column_config.TextColumn("Restaurant", width="medium"),
+                "cuisine": st.column_config.TextColumn("Cuisine"),
+                "city":    st.column_config.TextColumn("City"),
+                "koko":    st.column_config.ProgressColumn(
+                    "Koko Score", min_value=0, max_value=10, format="%d / 10"),
+                "value":   st.column_config.ProgressColumn(
+                    "Value Score", min_value=0, max_value=5, format="%d / 5"),
+                "verdict": st.column_config.TextColumn("Verdict"),
+            }
+        )
