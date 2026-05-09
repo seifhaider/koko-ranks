@@ -291,6 +291,15 @@ div[data-testid="stForm"] {
     border-radius: 10px !important;
     color: #4a4a6a !important;
 }
+            
+[data-testid="stSelectbox"] > div > div > div {
+    background: #ffffff !important;
+    color: #4a4a6a !important;
+}
+
+[data-testid="stSelectbox"] svg {
+    fill: #9b72cf !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
