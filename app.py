@@ -442,7 +442,13 @@ with right:
             scatter = px.scatter(df, x="value", y="koko", hover_name="name",
                                  hover_data={"cuisine": True, "city": True,
                                              "koko": True, "value": True},
-                                 color="cuisine", color_discrete_sequence=palette)
+                                 color="cuisine", color_discrete_sequence=palette,
+                                 labels={
+                                     "value": "Value",
+                                     "koko": "Koko Score",
+                                     "cuisine": "Cuisine",
+                                     "city": "City",
+                                 })
             for trace in scatter.data:
                 trace.marker.size = 13
                 trace.marker.line = dict(width=2, color="white")
@@ -464,9 +470,10 @@ with right:
                 paper_bgcolor="rgba(0,0,0,0)",
                 legend=dict(
                     title_text="Cuisine",
+                    title_font=dict(color="#4a4a6a"),
                     font=dict(size=10, color="#4a4a6a"),
                     bgcolor="rgba(255,255,255,0.95)",
-                    bordercolor="#4a4a6a", borderwidth=1),
+                    bordercolor="#e0d9f5", borderwidth=1),
                 margin=dict(l=10, r=130, t=15, b=10),
                 height=540,
                 font=dict(family="Plus Jakarta Sans"),
