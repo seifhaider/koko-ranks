@@ -284,6 +284,13 @@ div[data-testid="stForm"] {
     border-color: #9b72cf !important;
     color: #7c53b8 !important;
 }
+            
+[data-testid="stSelectbox"] > div > div {
+    background: #ffffff !important;
+    border: 1.5px solid #e0d9f5 !important;
+    border-radius: 10px !important;
+    color: #4a4a6a !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
