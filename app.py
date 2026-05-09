@@ -292,13 +292,23 @@ div[data-testid="stForm"] {
     color: #4a4a6a !important;
 }
             
-[data-testid="stSelectbox"] > div > div > div {
-    background: #ffffff !important;
+div[data-baseweb="select"] > div {
+    background-color: #ffffff !important;
+    border: 1.5px solid #e0d9f5 !important;
+    border-radius: 10px !important;
+}
+
+div[data-baseweb="select"] span {
     color: #4a4a6a !important;
 }
 
-[data-testid="stSelectbox"] svg {
-    fill: #9b72cf !important;
+ul[data-baseweb="menu"] {
+    background-color: #ffffff !important;
+}
+
+li[data-baseweb="menu-item"] {
+    background-color: #ffffff !important;
+    color: #4a4a6a !important;
 }
 </style>
 """, unsafe_allow_html=True)
