@@ -464,7 +464,7 @@ with right:
                 paper_bgcolor="rgba(0,0,0,0)",
                 legend=dict(
                     title_text="Cuisine",
-                    font=dict(size=10),
+                    font=dict(size=10, color="#4a4a6a"),
                     bgcolor="rgba(255,255,255,0.95)",
                     bordercolor="#e0d9f5", borderwidth=1),
                 margin=dict(l=10, r=130, t=15, b=10),
