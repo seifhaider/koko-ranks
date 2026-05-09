@@ -452,23 +452,21 @@ with right:
         fig.update_layout(
             xaxis=dict(
                 title=dict(text="Value (Price / Volume)",
-                           font=dict(size=11, color="#7070a0")),
                 range=[0.5, 5.5], dtick=1, showgrid=True,
                 gridcolor="rgba(224,217,245,0.8)", zeroline=False,
                 tickfont=dict(size=10, color="#9090b0")),
             yaxis=dict(
                 title=dict(text="Koko Score (Flavor)",
-                           font=dict(size=11, color="#7070a0")),
                 range=[0.5, 10.5], dtick=1, showgrid=True,
                 gridcolor="rgba(224,217,245,0.8)", zeroline=False,
                 tickfont=dict(size=10, color="#9090b0")),
             plot_bgcolor="white",
             paper_bgcolor="rgba(0,0,0,0)",
             legend=dict(
-                title=dict(text="Cuisine", font=dict(size=10, color="#7070a0")),
-                font=dict(size=10, family="Plus Jakarta Sans"),
+                title_text="Cuisine",
+                font=dict(size=10),
                 bgcolor="rgba(255,255,255,0.95)",
-                bordercolor="#e0d9f5", borderwidth=1, borderpad=8),
+                bordercolor="#e0d9f5", borderwidth=1),,
             margin=dict(l=10, r=130, t=15, b=10),
             height=540,
             font=dict(family="Plus Jakarta Sans"),
