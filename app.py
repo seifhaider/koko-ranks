@@ -442,17 +442,19 @@ with right:
             scatter = px.scatter(df, x="value", y="koko", hover_name="name",
                                  hover_data={"cuisine": True, "city": True,
                                              "koko": True, "value": True},
-                                 color="cuisine", color_discrete_sequence=palette,
-                                 labels={
-                                     "value": "Value",
-                                     "koko": "Koko Score",
-                                     "cuisine": "Cuisine",
-                                     "city": "City",
-                                 })
+                                 color="cuisine", color_discrete_sequence=palette)
             for trace in scatter.data:
                 trace.marker.size = 13
                 trace.marker.line = dict(width=2, color="white")
                 trace.marker.opacity = 0.92
+                trace.hovertemplate = (
+                    "<b>%{hovertext}</b><br><br>"
+                    "Cuisine: %{customdata[0]}<br>"
+                    "City: %{customdata[1]}<br>"
+                    "Koko Score: %{y}<br>"
+                    "Value: %{x}<br>"
+                    "<extra></extra>"
+                )       
                 fig.add_trace(trace)
 
             fig.update_layout(
